@@ -68,10 +68,27 @@ func (d *Database) CreateStudent(c echo.Context) error {
 func (d *Database) UpdateStudent(c echo.Context) error {
 	id := c.Param("id")
 	studentModel := &models.Students{}
+	responseStudent := &models.Students{}
 
 	if err := c.Bind(studentModel); err != nil {
 		c.JSON(http.StatusBadRequest, echo.Map{"message":"Can't fetched data from the client request"})
 		return err
+	}
+
+	if studentModel.ID != 0 {
+		responseStudent.ID = studentModel.ID
+	}
+
+	if studentModel.Name != "" {
+		responseStudent.Name = studentModel.Name
+	}
+
+	if studentModel.Age != 0 {
+		responseStudent.Age = studentModel.Age
+	}
+
+	if studentModel.Grade != "" {
+		responseStudent.Grade = studentModel.Grade
 	}
 	
 	if d.DB.Model(studentModel).Where("id = ?", id).Updates(studentModel).RowsAffected == 0 {
@@ -79,7 +96,7 @@ func (d *Database) UpdateStudent(c echo.Context) error {
 		return nil
 	}
 
-	c.JSON(http.StatusOK, echo.Map{"new_data":studentModel, "message":"Successfully updated data"})
+	c.JSON(http.StatusOK, echo.Map{"new_data":responseStudent, "message":"Successfully updated data"})
 	
 	return nil
 }
